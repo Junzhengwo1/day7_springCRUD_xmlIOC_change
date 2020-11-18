@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置代理的Service-->
+    <bean id="proxyAccountService" factory-bean="beanFactory" factory-method="getAccountService"></bean>
+    <!--配置beanfactory-->
+    <bean id="beanFactory" class="com.kou.factory.BeanFactory">
+        <!--注入Sercive-->
+        <property name="accountService" ref="accountService"></property>
+        <property name="transactionManager" ref="transactionManager"></property>
+    </bean>
+
+    <!--配置业务层对象-->
+    <bean id="accountService" class="com.kou.service.impl.AccountServiceImpl">
+        <!--注入Dao对象-->
+        <property name="accountDao" ref="accountDao"></property>
+
+    </bean>
+
+    <bean id="accountDao" class="com.kou.dao.impl.AccountDaoImpl">
+        <!--注入QueryRunner-->
+        <property name="runner" ref="runner" ></property>
+        <!--注入connectionUtils-->
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype">
+
+
+    </bean>
+
+
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/myspringtest?useUnicode=true&amp;characterEncoding=UTF8&amp;autoReconnect=true"></property>
+        <property name="user" value="root"></property>
+        <property name="password" value="123456"></property>
+    </bean>
+
+    <!--配置ConnectionUtils-->
+    <bean id="connectionUtils" class="com.kou.utils.ConnectionUtils">
+        <!--注入数据源-->
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="com.kou.utils.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"></property>
+    </bean>
+</beans>
